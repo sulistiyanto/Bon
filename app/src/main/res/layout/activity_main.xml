@@ -52,7 +52,7 @@
             android:layout_gravity="left"
             android:textSize="15dp"
             android:textStyle="bold"
-            android:text="Kontak developer :"/>
+            android:text="Kontak Programmer :"/>
 
         <ImageView
             xmlns:android="http://schemas.android.com/apk/res/android"
