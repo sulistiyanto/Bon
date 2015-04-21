@@ -10,6 +10,8 @@ import android.widget.TextView;
 import com.tiyanrcode.bon.R;
 import com.tiyanrcode.bon.model.Transaction;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.List;
 
 /**
@@ -67,11 +69,23 @@ public class ListTransactionAdapter extends BaseAdapter{
             holder = (ViewHolder) view.getTag();
         }
 
+        //convert Rp
+        DecimalFormat kursIndonesia = (DecimalFormat) DecimalFormat.getCurrencyInstance();
+        DecimalFormatSymbols formatRp = new DecimalFormatSymbols();
+
+        formatRp.setCurrencySymbol("");
+        formatRp.setMonetaryDecimalSeparator(',');
+        formatRp.setGroupingSeparator('.');
+
+        kursIndonesia.setDecimalFormatSymbols(formatRp);
+
+
         //fill row data
         Transaction currentItem = getItem(position);
         if (currentItem != null) {
             holder.txtDate.setText(currentItem.getDate());
-            holder.txtKredit.setText("" + currentItem.getCredit());
+            int credit = currentItem.getCredit();
+            holder.txtKredit.setText("" + kursIndonesia.format(credit));
             holder.txtPay.setText("" + currentItem.getPay());
             holder.txtSaldo.setText("" + currentItem.getSaldo());
         }
