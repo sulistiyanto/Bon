@@ -8,6 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.tiyanrcode.bon.R;
+import com.tiyanrcode.bon.function.Money;
 import com.tiyanrcode.bon.model.Transaction;
 
 import java.text.DecimalFormat;
@@ -87,9 +88,10 @@ public class ListTransactionAdapter extends BaseAdapter{
             int credit = currentItem.getCredit();
             int pay = currentItem.getPay();
             int saldo = currentItem.getSaldo();
-            holder.txtKredit.setText("" + kursIndonesia.format(credit));
-            holder.txtPay.setText("" + kursIndonesia.format(pay));
-            holder.txtSaldo.setText("" + kursIndonesia.format(saldo));
+            Money m = new Money();
+            holder.txtKredit.setText("" + m.money(credit));
+            holder.txtPay.setText("" + m.money(pay));
+            holder.txtSaldo.setText("" + m.money(saldo));
         }
         return view;
     }

@@ -82,7 +82,6 @@ public class CustomerDAO {
         ContentValues values = new ContentValues();
         values.put(DBHelper.COLUMN_CUSTOMER_NAME, name);
         values.put(DBHelper.COLUMN_CUSTOMER_ADDRESS, address);
-
         mDatabase.update(DBHelper.TABLE_CUSTOMERS, values, DBHelper.COLUMN_CUSTOMER_ID + " = ? "
                 , new String[]{String.valueOf(id)});
     }

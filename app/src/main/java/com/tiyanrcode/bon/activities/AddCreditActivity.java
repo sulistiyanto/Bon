@@ -1,6 +1,9 @@
 package com.tiyanrcode.bon.activities;
 
-import android.content.Intent;
+import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
@@ -8,11 +11,13 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tiyanrcode.bon.dao.TransactionDAO;
+import com.tiyanrcode.bon.function.Money;
 import com.tiyanrcode.bon.model.Transaction;
 import com.tiyanrcode.bon.R;
 
@@ -31,6 +36,7 @@ public class AddCreditActivity extends ActionBarActivity implements View.OnClick
     private TextView cusName;
     private TextView cusId;
     private Button btnCredit;
+    private Button btnDate;
 
     private int year;
     private int month;
@@ -38,6 +44,7 @@ public class AddCreditActivity extends ActionBarActivity implements View.OnClick
     private int credit;
     private int pay;
     private int saldo;
+    static final int DATE_PICKER_ID = 1111;
     private String customerId;
     private String month2;
     private String customerName;
@@ -123,10 +130,12 @@ public class AddCreditActivity extends ActionBarActivity implements View.OnClick
         cusName = (TextView) findViewById(R.id.cre_name);
         cusId = (TextView) findViewById(R.id.cre_id);
         btnCredit = (Button) findViewById(R.id.btn_credit);
+        btnDate = (Button) findViewById(R.id.tgl);
 
         cusName.setText(customerName);
         cusId.setText(customerId);
         btnCredit.setOnClickListener(this);
+        btnDate.setOnClickListener(this);
     }
 
     @Override
@@ -135,24 +144,33 @@ public class AddCreditActivity extends ActionBarActivity implements View.OnClick
             case R.id.btn_credit:
                 credit = Integer.parseInt(mCredit.getText().toString());
                 Log.d("credit", ""+credit);
-                Editable date = dateOfCredit.getText();
+                final Editable date = dateOfCredit.getText();
+                Money m = new Money();
                 if (!TextUtils.isEmpty(""+credit) && !TextUtils.isEmpty(date)) {
-                    Transaction createdTransaction = mTransactionDAO.createTransaction(date.toString(), credit, pay , credit + saldo, Long.parseLong(customerId));
-                   /* Bundle bundle = new Bundle();
-                    Intent intent = new Intent(AddCreditActivity.this, ListTransactionActivity.class);
-                    intent.putExtra(ListCustomerActivity.EXTRA_ADDED_CUSTOMER, createdTransaction);
-                    setResult(RESULT_OK, intent);
-                    bundle.putString("id", "" + customerId);
-                    bundle.putString("name", customerName);
-                    Log.d("no ", customerName);
-                    intent.putExtras(bundle);
-                    startActivity(intent);*/
-                    Toast.makeText(this, "Transaksi sukses", Toast.LENGTH_LONG).show();
-                    finish();
+                    AlertDialog alertDialog = new AlertDialog.Builder(AddCreditActivity.this).create();
+                    // Setting Dialog Title
+                    alertDialog.setTitle("Pesan Pemberitahuan!");
+                    // Setting Dialog Message
+                    alertDialog.setMessage("Total hutang pelanggan '" + customerName + "' adalah Rp. " + m.money(credit + saldo));
+                    // Setting Icon to Dialog
+                    alertDialog.setIcon(R.drawable.info20);
+                    // Setting OK Button
+                    alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog,int which)
+                        {
+                            Transaction createdTransaction = mTransactionDAO.createTransaction(date.toString(), credit, pay, credit + saldo, Long.parseLong(customerId));
+                            finish();
+                        }
+                    });
+                    // Showing Alert Message
+                    alertDialog.show();
                 }
                 else {
                     Toast.makeText(this, "Kolom hutang masih kosong", Toast.LENGTH_LONG).show();
                 }
+                break;
+            case R.id.tgl:
+                showDialog(DATE_PICKER_ID);
                 break;
             default:
                 break;
@@ -164,4 +182,26 @@ public class AddCreditActivity extends ActionBarActivity implements View.OnClick
         super.onDestroy();
         mTransactionDAO.close();
     }
+
+    @Override
+    protected Dialog onCreateDialog(int id) {
+        switch (id) {
+            case DATE_PICKER_ID:
+                return new DatePickerDialog(this, pickerListener, year, month,day);
+        }
+        return null;
+    }
+
+    private DatePickerDialog.OnDateSetListener pickerListener = new DatePickerDialog.OnDateSetListener() {
+        @Override
+        public void onDateSet(DatePicker view, int selectedYear,
+                              int selectedMonth, int selectedDay) {
+            year  = selectedYear;
+            month = selectedMonth;
+            day   = selectedDay;
+            //setMonth();
+            dateOfCredit.setText(new StringBuilder().append(day).append(" ").append(month2).append(" ")
+                    .append(year).append(" "));
+        }
+    };
 }

@@ -71,15 +71,14 @@ public class AddCustomerActivity extends ActionBarActivity implements View.OnCli
                 Editable customerAddress = txtAddress.getText();
                 if (!TextUtils.isEmpty(customerName) && !TextUtils.isEmpty(customerAddress)) {
                     if (c == 1) {
-                        Log.d("coba", "ok");
                         mCustomerDAO.updateCustomer(Long.parseLong(customerId), customerName.toString(), customerAddress.toString());
                         Intent intent = new Intent(AddCustomerActivity.this, ListCustomerActivity.class);
+                        setResult(RESULT_OK, intent);
                         startActivity(intent);
                         finish();
                         c= 0;
                     } else {
                         Customer createdCustumer = mCustomerDAO.createCustomer(customerName.toString(), customerAddress.toString());
-                        Log.d(TAG, "added customer : " + createdCustumer.getName());
                         Intent intent = new Intent();
                         intent.putExtra(ListCustomerActivity.EXTRA_ADDED_CUSTOMER, createdCustumer);
                         setResult(RESULT_OK, intent);

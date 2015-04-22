@@ -81,17 +81,35 @@
             android:textAppearance="?android:attr/textAppearance"
             android:textColor="@android:color/black" />
 
-        <EditText
-            android:id="@+id/date_credit"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:hint="Tanggal"
-            android:editable="false"
-            android:textAppearance="?android:attr/textAppearance"
-            android:textColor="@android:color/black" />
+            android:layout_gravity="center">
+
+            <EditText
+                android:id="@+id/date_credit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:layout_marginLeft="20dp"
+                android:layout_toLeftOf="@+id/tgl"
+                android:hint="Tanggal"
+                android:editable="false"
+                android:textAppearance="?android:attr/textAppearance"
+                android:textColor="@android:color/black" />
+
+            <Button
+                android:id="@+id/tgl"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginRight="20dp"
+                android:layout_alignParentRight="true"
+                android:text="@string/date"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:background="@android:color/transparent"/>
+
+            </RelativeLayout>
 
     </LinearLayout>
 

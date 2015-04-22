@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tiyanrcode.bon.dao.TransactionDAO;
+import com.tiyanrcode.bon.function.Money;
 import com.tiyanrcode.bon.model.Transaction;
 import com.tiyanrcode.bon.R;
 
@@ -175,42 +176,72 @@ public class AddPayActivity extends ActionBarActivity implements View.OnClickLis
         switch (v.getId()) {
             case R.id.btn_pay:
                 pay1 = Integer.parseInt(mPay.getText().toString());
-                Log.d("credit", ""+credit1);
                 final int total = pay1 - saldo1;
-                Log.d("saldo new", String.valueOf(saldo1));
+                Money m = new Money();
                 final Editable date = dateOfPay.getText();
-                if (total > 1) {
-                    AlertDialog alertDialog = new AlertDialog.Builder(AddPayActivity.this).create();
-                    // Setting Dialog Title
-                    alertDialog.setTitle("Pesan Pemberitahuan!");
-                    // Setting Dialog Message
-                    alertDialog.setMessage("Uang kembali pelanggan adalah " + total);
-                    // Setting Icon to Dialog
-                    alertDialog.setIcon(R.drawable.info20);
-                    // Setting OK Button
-                    alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog,int which)
-                        {
-                            Transaction tran = mTransactionDAO.getItemSaldoByPosition(Long.parseLong(customerId));
-                            int c = tran.getCredit();
-                            if (!TextUtils.isEmpty("" + credit1) && !TextUtils.isEmpty(date)) {
-                                Transaction createdTransaction = mTransactionDAO.createTransaction(date.toString(), credit1, c , 0, Long.parseLong(customerId));
-                                finish();
-                            }
-                        }
-                    });
-                    // Showing Alert Message
-                    alertDialog.show();
-                } else {
                     if (!TextUtils.isEmpty("" + pay1) && !TextUtils.isEmpty(date)) {
-                        Transaction createdTransaction = mTransactionDAO.createTransaction(date.toString(), credit1, pay1 , total, Long.parseLong(customerId));
-                        finish();
+                        if (total >= 1) {
+                            AlertDialog alertDialog = new AlertDialog.Builder(AddPayActivity.this).create();
+                            // Setting Dialog Title
+                            alertDialog.setTitle("Pesan Pemberitahuan!");
+                            // Setting Dialog Message
+                            alertDialog.setMessage("Uang kembali pelanggan '" + customerName + "' adalah Rp. " + m.money(total) +" dan LUNAS!");
+                            // Setting Icon to Dialog
+                            alertDialog.setIcon(R.drawable.info20);
+                            // Setting OK Button
+                            alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog,int which)
+                                {
+                                    if (!TextUtils.isEmpty("" + credit1) && !TextUtils.isEmpty(date)) {
+                                        Transaction createdTransaction = mTransactionDAO.createTransaction(date.toString(), credit1, saldo1 , 0, Long.parseLong(customerId));
+                                        finish();
+                                    }
+                                }
+                            });
+                            // Showing Alert Message
+                            alertDialog.show();
+                        } else if (total <= -1) {
+                            final int total2 = saldo1 - pay1;
+                            AlertDialog alertDialog = new AlertDialog.Builder(AddPayActivity.this).create();
+                            // Setting Dialog Title
+                            alertDialog.setTitle("Pesan Pemberitahuan!");
+                            // Setting Dialog Message
+                            alertDialog.setMessage("Pelanggan '" + customerName + "' masih punya hutang Rp. " + m.money(total2));
+                            // Setting Icon to Dialog
+                            alertDialog.setIcon(R.drawable.info20);
+                            // Setting OK Button
+                            alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog,int which)
+                                {
+                                    Transaction createdTransaction = mTransactionDAO.createTransaction(date.toString(), credit1, pay1 , total2, Long.parseLong(customerId));
+                                    finish();
+                                }
+                            });
+                            // Showing Alert Message
+                            alertDialog.show();
+                        } else {
+                            AlertDialog alertDialog = new AlertDialog.Builder(AddPayActivity.this).create();
+                            // Setting Dialog Title
+                            alertDialog.setTitle("Pesan Pemberitahuan!");
+                            // Setting Dialog Message
+                            alertDialog.setMessage("Hutang pelanggan '" + customerName + "' LUNAS!");
+                            // Setting Icon to Dialog
+                            alertDialog.setIcon(R.drawable.info20);
+                            // Setting OK Button
+                            alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog,int which)
+                                {
+                                    Transaction createdTransaction = mTransactionDAO.createTransaction(date.toString(), credit1, pay1, total, Long.parseLong(customerId));
+                                    finish();
+                                }
+                            });
+                            // Showing Alert Message
+                            alertDialog.show();
+                        }
                     }
                     else {
                         Toast.makeText(this, "Kolom hutang masih kosong", Toast.LENGTH_LONG).show();
                     }
-                }
-
                 break;
             default:
                 break;
