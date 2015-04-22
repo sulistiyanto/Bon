@@ -61,6 +61,7 @@ public class ListCustomerActivity extends ActionBarActivity implements View.OnCl
             mTxtEmptyListCustomers.setVisibility(View.VISIBLE);
             mListviewCustomers.setVisibility(View.GONE);
         }
+
     }
 
     private void initViews() {
@@ -128,6 +129,7 @@ public class ListCustomerActivity extends ActionBarActivity implements View.OnCl
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
         final Customer clickedCustomer = mAdapter.getItem(position);
         Log.d(TAG, "clickedItem : " + clickedCustomer.getName());
         Log.d(TAG, "clickedItemID : " + clickedCustomer.getId());
