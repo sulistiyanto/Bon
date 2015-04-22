@@ -49,6 +49,6 @@
         android:divider="@android:drawable/divider_horizontal_bright"
         android:dividerHeight="0.5dp"
         tools:listitem="@layout/list_item_customer"
-        android:listSelector="@android:drawable/list_selector_background" />
+        android:listSelector="@drawable/list_color" />
 
 </RelativeLayout>
