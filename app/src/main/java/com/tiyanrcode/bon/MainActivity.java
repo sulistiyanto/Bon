@@ -13,7 +13,7 @@ import com.tiyanrcode.bon.activities.ListCustomerActivity;
 public class MainActivity extends ActionBarActivity {
 
     private static long back_pressed_time;
-    private static long PERIOD = 1000;
+    private static long PERIOD = 400;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +35,7 @@ public class MainActivity extends ActionBarActivity {
     @Override
     public void onBackPressed() {
         if (back_pressed_time + PERIOD > System.currentTimeMillis()) super.onBackPressed();
-        else Toast.makeText(getBaseContext(), "Tekan sekali lagi untuk keluar!", Toast.LENGTH_SHORT).show();
+        else Toast.makeText(getBaseContext(), "Tekan dua kali untuk keluar!", Toast.LENGTH_SHORT).show();
         back_pressed_time = System.currentTimeMillis();
     }
 
