@@ -85,9 +85,11 @@ public class ListTransactionAdapter extends BaseAdapter{
         if (currentItem != null) {
             holder.txtDate.setText(currentItem.getDate());
             int credit = currentItem.getCredit();
+            int pay = currentItem.getPay();
+            int saldo = currentItem.getSaldo();
             holder.txtKredit.setText("" + kursIndonesia.format(credit));
-            holder.txtPay.setText("" + currentItem.getPay());
-            holder.txtSaldo.setText("" + currentItem.getSaldo());
+            holder.txtPay.setText("" + kursIndonesia.format(pay));
+            holder.txtSaldo.setText("" + kursIndonesia.format(saldo));
         }
         return view;
     }
