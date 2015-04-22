@@ -101,4 +101,12 @@ public class AddCustomerActivity extends ActionBarActivity implements View.OnCli
         super.onDestroy();
         mCustomerDAO.close();
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(AddCustomerActivity.this, ListCustomerActivity.class);
+        startActivity(intent);
+        finish();
+    }
 }
