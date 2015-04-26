@@ -7,7 +7,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
-import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -21,6 +21,8 @@ import com.tiyanrcode.bon.function.Money;
 import com.tiyanrcode.bon.model.Transaction;
 import com.tiyanrcode.bon.R;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Calendar;
 import java.util.List;
 
@@ -46,9 +48,7 @@ public class AddCreditActivity extends ActionBarActivity implements View.OnClick
     private int saldo;
     static final int DATE_PICKER_ID = 1111;
     private String customerId;
-    private String month2;
     private String customerName;
-    private String date;
 
     final Calendar c = Calendar.getInstance();
     private List<Transaction> mListTransactions;
@@ -60,9 +60,7 @@ public class AddCreditActivity extends ActionBarActivity implements View.OnClick
         setContentView(R.layout.activity_add_credit);
         getSupportActionBar().hide();
 
-        initView();
-        //set date day
-        setDate();
+
         //get id and name customer
         Bundle bundle = this.getIntent().getExtras();
         if (bundle.containsKey("name")) {
@@ -70,6 +68,8 @@ public class AddCreditActivity extends ActionBarActivity implements View.OnClick
             customerId = bundle.getString("id");
         }
 
+        initView();
+        setDate();
         // fill the listView
         mTransactionDAO = new TransactionDAO(this);
         mListTransactions = mTransactionDAO.getTransactionOfTransaction(Long.parseLong(customerId));
@@ -83,45 +83,51 @@ public class AddCreditActivity extends ActionBarActivity implements View.OnClick
             saldo = 0;
             pay = 0;
         }
+
+        mCredit.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                /***
+                 * No need to continue the function if there is nothing to
+                 * format
+                 ***/
+                if (s.length() == 0){
+                    return;
+                }
+
+                /*** Now the number of digits in price is limited to 8 ***/
+                String value = s.toString().replaceAll(",", "");
+                if (value.length() > 9) {
+                    value = value.substring(0, 9);
+                }
+                String formattedPrice = getFormatedCurrency(value);
+                if (!(formattedPrice.equalsIgnoreCase(s.toString()))) {
+                    /***
+                     * The below given line will call the function recursively
+                     * and will ends at this if block condition
+                     ***/
+                    mCredit.setText(formattedPrice);
+                    mCredit.setSelection(mCredit.length());
+                }
+            }
+        });
     }
 
     private void setDate() {
         year  = c.get(Calendar.YEAR);
-        setMonth();
+        month = c.get(Calendar.MONTH);
         day   = c.get(Calendar.DAY_OF_MONTH);
 
-        dateOfCredit.setText(new StringBuilder().append(day).append(" ").append(month2).append(" ")
+        dateOfCredit.setText(new StringBuilder().append(day).append("/").append(month).append("/")
                 .append(year).append(" "));
-    }
-
-    private void setMonth() {
-        month = c.get(Calendar.MONTH);
-        int m = month + 1;
-        if (m == 1){
-            month2 = "Januari";
-        } else if (m == 2) {
-            month2 = "Pebruari";
-        } else if (m == 3) {
-            month2 = "Maret";
-        } else if (m == 4) {
-            month2 = "April";
-        } else if (m == 5) {
-            month2 = "Mei";
-        } else if (m == 6) {
-            month2 = "Juni";
-        } else if (m == 7) {
-            month2 = "Juli";
-        } else if (m == 8) {
-            month2 = "Agustus";
-        } else if (m == 9) {
-            month2 = "September";
-        }else if (m == 10) {
-            month2 = "Oktober";
-        }else if (m == 11) {
-            month2 = "Nopember";
-        }else if (m == 12) {
-            month2 = "Desember";
-        }
     }
 
     private void initView() {
@@ -142,11 +148,13 @@ public class AddCreditActivity extends ActionBarActivity implements View.OnClick
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_credit:
-                credit = Integer.parseInt(mCredit.getText().toString());
-                Log.d("credit", ""+credit);
-                final Editable date = dateOfCredit.getText();
-                Money m = new Money();
-                if (!TextUtils.isEmpty(""+credit) && !TextUtils.isEmpty(date)) {
+
+                if (!mCredit.getText().toString().isEmpty()) {
+                    String mcre = mCredit.getText().toString().replaceAll(",", "");
+                    credit = Integer.parseInt(mcre);
+                    Log.d("credit", mcre);
+                    final Editable date = dateOfCredit.getText();
+                    Money m = new Money();
                     AlertDialog alertDialog = new AlertDialog.Builder(AddCreditActivity.this).create();
                     // Setting Dialog Title
                     alertDialog.setTitle("Pesan Pemberitahuan!");
@@ -200,8 +208,18 @@ public class AddCreditActivity extends ActionBarActivity implements View.OnClick
             month = selectedMonth;
             day   = selectedDay;
             //setMonth();
-            dateOfCredit.setText(new StringBuilder().append(day).append(" ").append(month2).append(" ")
+            dateOfCredit.setText(new StringBuilder().append(day).append("/").append(month).append("/")
                     .append(year).append(" "));
         }
     };
+
+    public static String getFormatedCurrency(String value) {
+        try {
+            NumberFormat formatter = new DecimalFormat("###,###,###,###");
+            return formatter.format(Double.parseDouble(value));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
 }

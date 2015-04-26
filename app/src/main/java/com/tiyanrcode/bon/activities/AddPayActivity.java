@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -18,6 +19,8 @@ import com.tiyanrcode.bon.function.Money;
 import com.tiyanrcode.bon.model.Transaction;
 import com.tiyanrcode.bon.R;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Calendar;
 import java.util.List;
 
@@ -40,7 +43,6 @@ public class AddPayActivity extends ActionBarActivity implements View.OnClickLis
     private int saldo1;
     private String customerId;
     private String customerName;
-    private String month2;
 
     final Calendar c = Calendar.getInstance();
     private List<Transaction> mListTransactions;
@@ -112,46 +114,53 @@ public class AddPayActivity extends ActionBarActivity implements View.OnClickLis
             // Showing Alert Message
             alertDialog.show();
         }
+
+        mPay.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                /***
+                 * No need to continue the function if there is nothing to
+                 * format
+                 ***/
+                if (s.length() == 0){
+                    return;
+                }
+
+                /*** Now the number of digits in price is limited to 8 ***/
+                String value = s.toString().replaceAll(",", "");
+                if (value.length() > 9) {
+                    value = value.substring(0, 9);
+                }
+                String formattedPrice = getFormatedCurrency(value);
+                if (!(formattedPrice.equalsIgnoreCase(s.toString()))) {
+                    /***
+                     * The below given line will call the function recursively
+                     * and will ends at this if block condition
+                     ***/
+                    mPay.setText(formattedPrice);
+                    mPay.setSelection(mPay.length());
+                }
+            }
+        });
     }
 
     private void setDate() {
         year  = c.get(Calendar.YEAR);
-        setMonth();
+        month = c.get(Calendar.MONTH);
         day   = c.get(Calendar.DAY_OF_MONTH);
 
-        dateOfPay.setText(new StringBuilder().append(day).append(" ").append(month2).append(" ")
+        dateOfPay.setText(new StringBuilder().append(day).append("/").append(month).append("/")
                 .append(year).append(" "));
     }
 
-    private void setMonth() {
-        month = c.get(Calendar.MONTH);
-        int m = month + 1;
-        if (m == 1){
-            month2 = "Januari";
-        } else if (m == 2) {
-            month2 = "Pebruari";
-        } else if (m == 3) {
-            month2 = "Maret";
-        } else if (m == 4) {
-            month2 = "April";
-        } else if (m == 5) {
-            month2 = "Mei";
-        } else if (m == 6) {
-            month2 = "Juni";
-        } else if (m == 7) {
-            month2 = "Juli";
-        } else if (m == 8) {
-            month2 = "Agustus";
-        } else if (m == 9) {
-            month2 = "September";
-        }else if (m == 10) {
-            month2 = "Oktober";
-        }else if (m == 11) {
-            month2 = "Nopember";
-        }else if (m == 12) {
-            month2 = "Desember";
-        }
-    }
 
     private void initView() {
         dateOfPay = (EditText) findViewById(R.id.date_pay);
@@ -175,17 +184,19 @@ public class AddPayActivity extends ActionBarActivity implements View.OnClickLis
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_pay:
-                pay1 = Integer.parseInt(mPay.getText().toString());
-                final int total = pay1 - saldo1;
-                Money m = new Money();
-                final Editable date = dateOfPay.getText();
-                    if (!TextUtils.isEmpty("" + pay1) && !TextUtils.isEmpty(date)) {
+                    if (!mPay.getText().toString().isEmpty()) {
+                        String mcre = mPay.getText().toString().replaceAll(",", "");
+                        pay1 = Integer.parseInt(mcre);
+                        Log.d("credit", mcre);
+                        final int total = pay1 - saldo1;
+                        Money m = new Money();
+                        final Editable date = dateOfPay.getText();
                         if (total >= 1) {
                             AlertDialog alertDialog = new AlertDialog.Builder(AddPayActivity.this).create();
                             // Setting Dialog Title
                             alertDialog.setTitle("Pesan Pemberitahuan!");
                             // Setting Dialog Message
-                            alertDialog.setMessage("Uang kembali pelanggan '" + customerName + "' adalah Rp. " + m.money(total) +" dan LUNAS!");
+                            alertDialog.setMessage("Uang kembali pelanggan '" + customerName + "' adalah Rp. " + m.money(total) +" dan hutang LUNAS!");
                             // Setting Icon to Dialog
                             alertDialog.setIcon(R.drawable.info20);
                             // Setting OK Button
@@ -240,11 +251,21 @@ public class AddPayActivity extends ActionBarActivity implements View.OnClickLis
                         }
                     }
                     else {
-                        Toast.makeText(this, "Kolom hutang masih kosong", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, "Kolom bayar masih kosong", Toast.LENGTH_LONG).show();
                     }
                 break;
             default:
                 break;
         }
+    }
+
+    public static String getFormatedCurrency(String value) {
+        try {
+            NumberFormat formatter = new DecimalFormat("###,###,###,###");
+            return formatter.format(Double.parseDouble(value));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 }

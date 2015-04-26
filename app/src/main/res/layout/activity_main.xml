@@ -26,10 +26,11 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="bottom"
+            android:layout_marginLeft="15dp"
             android:layout_gravity="center"
             android:textColor="#ffffff"
             android:textStyle="bold"
-            android:text="beta version "/>
+            android:text="1.0.2"/>
 
     </LinearLayout>
 
