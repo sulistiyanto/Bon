@@ -78,6 +78,7 @@
             android:layout_marginRight="20dp"
             android:hint="Hutang"
             android:inputType="number"
+            android:maxLength="9"
             android:textAppearance="?android:attr/textAppearance"
             android:textColor="@android:color/black" />
 
