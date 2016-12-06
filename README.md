@@ -1,2 +1,2 @@
 # Bon
-Aplikasi Kasbon
+Aplikasi Kasbon untuk mencatat hutang-hutang pelanggan
